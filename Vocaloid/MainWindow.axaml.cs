@@ -1,4 +1,8 @@
+using System.IO;
+using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 
 namespace Vocaloid;
 
@@ -10,8 +14,31 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    public void Generate()
+    private async void OnSelectFileClicked(object sender, RoutedEventArgs e)
     {
-        Track music = new("Test", 120);
+        var storageProvider = this.StorageProvider;
+
+        var jsonFileType = new FilePickerFileType("JSON Files")
+        {
+            Patterns = ["*.json"]
+        };
+
+        var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Select .JSON File...",
+            AllowMultiple = false,
+            FileTypeFilter = [jsonFileType]
+        });
+
+        if (files.Any())
+        {
+            FilePathText.Text = files[0].Path.LocalPath;
+        }
+    }
+
+
+    public void Compile(string pathName)
+    {
+        
     }
 }
