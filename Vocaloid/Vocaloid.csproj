@@ -16,5 +16,6 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="NAudio" />
+    <PackageReference Include="NAudio.Lame" />
   </ItemGroup>
 </Project>

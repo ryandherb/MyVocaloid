@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using NAudio.Lame;
 
 namespace Vocaloid
 {
@@ -16,16 +17,19 @@ namespace Vocaloid
         public string FilePath { get; } = filePath;
         public double Duration { get; } = duration;
         public int Pitch { get; } = pitch;
-        public void PlayNote()
+        public async Task PlayNote()
         {
-            using var audioFile = new AudioFileReader(FilePath);
+            await using var audioFile = new AudioFileReader(FilePath);
             using var outputDevice = new WaveOutEvent();
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            outputDevice.PlaybackStopped += (s, e) => tcs.SetResult(true);
+
             outputDevice.Init(audioFile);
             outputDevice.Play();
-            while (outputDevice.PlaybackState == PlaybackState.Playing)
-            {
-                System.Threading.Thread.Sleep(100);
-            }
+
+            await tcs.Task;
         }
     }
 
@@ -37,7 +41,7 @@ namespace Vocaloid
 
         public void AddNote(Note n)
         {
-            var reader = new AudioFileReader(n.FilePath);
+            using var reader = new AudioFileReader(n.FilePath);
             var sample = reader.ToSampleProvider();
 
             var trimmed = new OffsetSampleProvider(sample)
@@ -54,8 +58,6 @@ namespace Vocaloid
         }
         public async Task<bool> Play()
         {
-
-
             if (Notes.Count == 0)
             {
                 return false;
@@ -63,6 +65,8 @@ namespace Vocaloid
 
             var playlist = new ConcatenatingSampleProvider(Notes);
             var outputDevice = new WaveOutEvent();
+
+            SaveToMp3(playlist, $"{this.TrackName}.mp3");
 
             var tcs = new TaskCompletionSource<bool>();
 
@@ -74,6 +78,18 @@ namespace Vocaloid
             await tcs.Task;
 
             return true;
+        }
+
+        public void SaveToMp3(ISampleProvider provider, string outputFilePath)
+        {
+            using var writer = new LameMP3FileWriter(outputFilePath, provider.WaveFormat, 128);
+            var waveProvider = provider.ToWaveProvider();
+            byte[] buffer = new byte[waveProvider.WaveFormat.AverageBytesPerSecond];
+            int bytesRead;
+            while ((bytesRead = waveProvider.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                writer.Write(buffer, 0, bytesRead);
+            }
         }
     }
 }
