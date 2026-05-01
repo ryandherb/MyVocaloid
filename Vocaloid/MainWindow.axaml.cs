@@ -1,5 +1,8 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -32,13 +35,52 @@ public partial class MainWindow : Window
 
         if (files.Any())
         {
-            FilePathText.Text = files[0].Path.LocalPath;
+            string pathName = files[0].Path.AbsolutePath;
+            FilePathText.Text = pathName;
+
+            await Compile(pathName);
+
         }
     }
 
 
-    public void Compile(string pathName)
+    public async Task Compile(string pathName)
     {
-        
+        string jsonRaw = File.ReadAllText(pathName);
+        var track = JsonSerializer.Deserialize<TrackData>(jsonRaw);
+
+
+        if (track == null)
+        {
+            return;
+        }
+        Console.WriteLine($"Starting compilation of track: {track.TrackName}");
+        Track media = new(track.TrackName, track.Tempo);
+
+        foreach (NoteData n in track.Notes)
+        {
+            string phonemePath = GetPhoneme(n.Note);
+
+            if (!File.Exists(phonemePath))
+            {
+                Console.WriteLine($"Phoneme file {phonemePath} not found");
+            }
+
+            double duration = n.Duration;
+            int pitch = n.Pitch;
+
+            media.AddNote(new(phonemePath, duration, pitch));
+        }
+
+        await media.Play();
+    }
+
+    private string GetPhoneme(string phoneme)
+    {
+        return phoneme switch
+        {
+            "longA" => "./phonemes/longa.wav",
+            _ => "",
+        };
     }
 }
