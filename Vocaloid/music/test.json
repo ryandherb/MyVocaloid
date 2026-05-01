@@ -6,6 +6,11 @@
             "note": "longA",
             "duration": 2.0,
             "pitch": 1
+        },
+        {
+            "note": "longA",
+            "duration": 1.0,
+            "pitch": 2
         }
     ]
 }

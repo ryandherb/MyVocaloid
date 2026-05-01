@@ -47,6 +47,9 @@ public partial class MainWindow : Window
     public async Task Compile(string pathName)
     {
         string jsonRaw = File.ReadAllText(pathName);
+        Console.WriteLine($"Path: {pathName}");
+        Console.WriteLine($"JSON length: {jsonRaw.Length}");
+        Console.WriteLine($"JSON: '{jsonRaw}'");
         var track = JsonSerializer.Deserialize<TrackData>(jsonRaw);
 
 
