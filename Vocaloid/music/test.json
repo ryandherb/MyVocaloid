@@ -1,0 +1,11 @@
+{
+    "trackName": "Test",
+    "tempo": 120,
+    "notes": [
+        {
+            "note": "longA",
+            "duration": 2.0,
+            "pitch": 1
+        }
+    ]
+}
