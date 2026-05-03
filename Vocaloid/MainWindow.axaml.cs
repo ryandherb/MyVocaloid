@@ -57,12 +57,13 @@ public partial class MainWindow : Window
         {
             return;
         }
+
         Console.WriteLine($"Starting compilation of track: {track.TrackName}");
         Track media = new(track.TrackName, track.Tempo);
 
         foreach (NoteData n in track.Notes)
         {
-            string phonemePath = GetPhoneme(n.Note);
+            string phonemePath = "./phonemes/" + n.Note + ".wav";
 
             if (!File.Exists(phonemePath))
             {
@@ -76,14 +77,5 @@ public partial class MainWindow : Window
         }
 
         await media.Play();
-    }
-
-    private string GetPhoneme(string phoneme)
-    {
-        return phoneme switch
-        {
-            "longA" => "./phonemes/longa.wav",
-            _ => "",
-        };
     }
 }

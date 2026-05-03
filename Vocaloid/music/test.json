@@ -3,14 +3,24 @@
     "tempo": 120,
     "notes": [
         {
-            "note": "longA",
-            "duration": 2.0,
+            "note": "h",
+            "duration": 0.6,
             "pitch": 1
         },
         {
-            "note": "longA",
+            "note": "short_e",
             "duration": 1.0,
-            "pitch": 2
+            "pitch": 1
+        },
+        {
+            "note": "l",
+            "duration": 0.6,
+            "pitch": 1
+        },
+        {
+            "note": "long_o",
+            "duration": 1.0,
+            "pitch": 1
         }
     ]
 }
